@@ -60,3 +60,27 @@ class coreMatrices:
         for i in range(result.shape[0]):
             result[i][i] = 0
         return result
+
+    @staticmethod
+    def laplacian(data, kernelFunction=kernels.distanceInverse):
+        temp = coreMatrices.affinityMatrix(data, kernelFunction)
+        diag = numpy.diag(temp.sum(axis=1))
+        return diag - temp
+
+    @staticmethod
+    def normalizedAdjacencyMatrix(data,
+                                  kernelFunction=kernels.distanceInverse):
+        temp = coreMatrices.affinityMatrix(data, kernelFunction)
+        diag = temp.sum(axis=1)
+        invDiag = np.diag(
+            np.array([1/math.sqrt(elem) for elem in diag])
+            )
+        nAdj = numpy.matmul(invDiag, temp)
+        nAdj = numpy.matmul(nAdj, invDiag)
+        return nAdj
+
+    @staticmethod
+    def noramlizedLaplacianMatrix(data,
+                                  kernelFunction=kernels.distanceInverse):
+        temp = coreMatrices.normalizedAdjacencyMatrix(data)
+        return numpy.identity(temp.shape[0]) - temp

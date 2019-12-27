@@ -9,6 +9,10 @@ from sklearn.cluster import SpectralClustering
 import os
 # For visualization
 import matplotlib.pyplot as plt
+# For creating affinity and Distance Matrices
+from linear_algebra_conversion import *
+# For graph processing
+import networkx as nx 
 
 # Dataset
 datasetBankUrl = "http://cs.joensuu.fi/sipu/datasets/"
@@ -68,7 +72,41 @@ datasets = [dataset("D31", "http://cs.joensuu.fi/sipu/datasets/D31.txt",
 for dataset in datasets:
     print("Testing DataSet: ", dataset.name)
 
-    #
+    # Making Affinity Graph and Laplacian
+    AdjMat = coreMatrices.affinityMatrix(dataset.data)
+    plt.imshow(AdjMat, cmap='jet', norm=plt.Normalize(0, 1))
+    plt.savefig("figs/" + dataset.name + "AdjMat.png", dpi=250)
+    plt.show()
+    Graph = nx.from_numpy_array(AdjMat)
+
+    LaplacianMat = coreMatrices.laplacian(dataset.data)
+    plt.imshow(LaplacianMat, cmap='jet', norm=plt.Normalize(-2, 1))
+    plt.savefig("figs/" + dataset.name + "Laplacian.png", dpi=250)
+    plt.show()
+
+    normalizedAdjMat = coreMatrices.normalizedAdjacencyMatrix(
+        dataset.data
+    )
+    plt.imshow(normalizedAdjMat, cmap='jet', norm=plt.Normalize(0, 1))
+    plt.savefig("figs/" + dataset.name + "normAdjMat.png", dpi=250)
+    plt.show()
+
+    normalizedLapMat = coreMatrices.noramlizedLaplacianMatrix(
+        dataset.data
+    )
+    plt.imshow(normalizedLapMat, cmap='jet', norm=plt.Normalize(-0.01, 0))
+    plt.savefig("figs/" + dataset.name + "normLapMat.png", dpi=250)
+    plt.show()
+
+    eVal, eVec = np.linalg.eigh(normalizedLapMat)
+    plt.scatter(range(eVal.shape[0]), eVal)
+    plt.savefig("figs/" + dataset.name + "eighs.png", dpi=250)
+
+    plt.scatter(range(eVal[:40].shape[0]), eVal[:40])
+    plt.savefig("figs/" + dataset.name + "eighs40.png", dpi=250)
+
+    plt.scatter(range(eVal[:10].shape[0]), eVal[:10])
+    plt.savefig("figs/" + dataset.name + "eighs10.png", dpi=250)
 
     # k-Means
     print("Running k-means algorithm")

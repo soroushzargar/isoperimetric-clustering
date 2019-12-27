@@ -13,12 +13,11 @@ class IsoperimetricClustering:
     def fit_predict(self, X, metric="norm", additional_arg=2):
         # Creating an affinity matrix
         distMat = coreMatrices.distanceMatrix(X, metric=metric,
-                                              additional_arg=
-                                              additional_arg)
+                                              additional_arg=additional_arg)
         graph = networkx.from_numpy_matrix(distMat)
-        
+
         mst = None
-        for sp in range(spanningTreeNumber+1):
+        for sp in range(spanningTreeNumber + 1):
             sp = networkx.minimum_spanning_tree(graph)
             mst = sp
             for edge in sp.edges:
