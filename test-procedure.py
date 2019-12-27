@@ -66,7 +66,13 @@ def bestPermution(y1, y2):
 datasets = [dataset("D31", "http://cs.joensuu.fi/sipu/datasets/D31.txt",
             "D31", 31),
             dataset("Jain", "http://cs.joensuu.fi/sipu/datasets/jain.txt",
-            "Jain", 2)
+            "Jain", 2),
+            dataset("Flame", "http://cs.joensuu.fi/sipu/datasets/flame.txt",
+            "Flame", 2),
+            dataset("PathBased", "http://cs.joensuu.fi/sipu/datasets/flame.txt",
+            "PathBased", 3),
+            dataset("R15", "http://cs.joensuu.fi/sipu/datasets/R15.txt",
+            "R15", 15)
             ]
 
 for dataset in datasets:
