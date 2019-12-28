@@ -26,7 +26,23 @@ class IsoperimetricClustering:
 
 
 class MinCut:
-    n_clusters = 2
+    __n_clusters = 2
+
+    def __init__(self, k):
+        self.__n_clusters = k
 
     def fit_predict(self, X):
-        pass
+        adjMat = coreMatrices.affinityMatrix(X)
+        graph = networkx.from_numpy_matrix(adjMat)
+        edgeCut = networkx.minimum_edge_cut(graph)
+        for edge in edgeCut:
+            graph.remove_edge(edge[0], edge[1])
+        cc = list(networkx.connected_components(graph))
+        i = 0
+        target = [-1] * X.shape[0]
+        for c in list(cc):
+            comp = list(c)
+            for elem in c:
+                target[elem] = i
+            i += 1
+        return target

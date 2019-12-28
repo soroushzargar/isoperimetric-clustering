@@ -13,6 +13,12 @@ import matplotlib.pyplot as plt
 from linear_algebra_conversion import *
 # For graph processing
 import networkx as nx 
+# Graph Clustering Algorithms
+from graph_processing import MinCut
+# For PCA
+from sklearn.decomposition import PCA
+# For Spectral Embedding 
+from sklearn.manifold import SpectralEmbedding
 
 # Dataset
 datasetBankUrl = "http://cs.joensuu.fi/sipu/datasets/"
@@ -63,56 +69,85 @@ def bestPermution(y1, y2):
     pass
 
 
-datasets = [dataset("D31", "http://cs.joensuu.fi/sipu/datasets/D31.txt",
-            "D31", 31),
-            dataset("Jain", "http://cs.joensuu.fi/sipu/datasets/jain.txt",
+datasets = [dataset("Jain", "http://cs.joensuu.fi/sipu/datasets/jain.txt",
             "Jain", 2),
             dataset("Flame", "http://cs.joensuu.fi/sipu/datasets/flame.txt",
             "Flame", 2),
-            dataset("PathBased", "http://cs.joensuu.fi/sipu/datasets/flame.txt",
+            dataset("PathBased",
+                    "http://cs.joensuu.fi/sipu/datasets/flame.txt",
             "PathBased", 3),
             dataset("R15", "http://cs.joensuu.fi/sipu/datasets/R15.txt",
             "R15", 15)
             ]
 
+plt.set_cmap("Dark2")
+
 for dataset in datasets:
     print("Testing DataSet: ", dataset.name)
+
+    # Plots relevant to unprocessed dataset
+    plt.scatter(dataset.data[:, 0], dataset.data[:, 1],
+                c=dataset.targets)
+    plt.savefig("figs/" + dataset.name + "shape.png", dpi=250)
+    plt.clf()
+
+    # PCA Plots
+    pca = PCA()
+    newRep = pca.fit_transform(dataset.data)
+    plt.scatter(newRep[:, 0], newRep[:, 1],
+                c=dataset.targets)
+    plt.savefig("figs/" + dataset.name + "pca.png", dpi=250)
+    plt.clf()
+
+    # Spectral Embedding Plots
+    spec = SpectralEmbedding()
+    newRep = spec.fit_transform(dataset.data)
+    plt.scatter(newRep[:, 0], newRep[:, 1],
+                c=dataset.targets)
+    plt.savefig("figs/" + dataset.name + "specMap.png", dpi=250)
+    plt.clf()
 
     # Making Affinity Graph and Laplacian
     AdjMat = coreMatrices.affinityMatrix(dataset.data)
     plt.imshow(AdjMat, cmap='jet', norm=plt.Normalize(0, 1))
     plt.savefig("figs/" + dataset.name + "AdjMat.png", dpi=250)
-    plt.show()
+    # plt.show()
+    plt.clf()
     Graph = nx.from_numpy_array(AdjMat)
 
     LaplacianMat = coreMatrices.laplacian(dataset.data)
     plt.imshow(LaplacianMat, cmap='jet', norm=plt.Normalize(-2, 1))
     plt.savefig("figs/" + dataset.name + "Laplacian.png", dpi=250)
-    plt.show()
-
+    # plt.show()
+    plt.clf()
     normalizedAdjMat = coreMatrices.normalizedAdjacencyMatrix(
         dataset.data
     )
     plt.imshow(normalizedAdjMat, cmap='jet', norm=plt.Normalize(0, 1))
     plt.savefig("figs/" + dataset.name + "normAdjMat.png", dpi=250)
-    plt.show()
+    # plt.show()
+    plt.clf()
 
     normalizedLapMat = coreMatrices.noramlizedLaplacianMatrix(
         dataset.data
     )
     plt.imshow(normalizedLapMat, cmap='jet', norm=plt.Normalize(-0.01, 0))
     plt.savefig("figs/" + dataset.name + "normLapMat.png", dpi=250)
-    plt.show()
+    # plt.show()
+    plt.clf()
 
     eVal, eVec = np.linalg.eigh(normalizedLapMat)
     plt.scatter(range(eVal.shape[0]), eVal)
     plt.savefig("figs/" + dataset.name + "eighs.png", dpi=250)
+    plt.clf()
 
     plt.scatter(range(eVal[:40].shape[0]), eVal[:40])
     plt.savefig("figs/" + dataset.name + "eighs40.png", dpi=250)
+    plt.clf()
 
     plt.scatter(range(eVal[:10].shape[0]), eVal[:10])
     plt.savefig("figs/" + dataset.name + "eighs10.png", dpi=250)
+    plt.clf()
 
     # k-Means
     print("Running k-means algorithm")
@@ -121,12 +156,22 @@ for dataset in datasets:
     # insider - isualization of the data under the clustering
     plt.scatter(dataset.data[:, 0], dataset.data[:, 1], c=kmeansResult,
                 s=2)
-    plt.show()
+    # plt.show()
+    plt.clf()
 
+    # Min-Cut
+    if dataset.k == 2:
+        minC = MinCut(2)
+        mincutResult = minC.fit_predict(dataset.data)
+        plt.scatter(dataset.data[:, 0], dataset.data[:, 1], c=mincutResult,
+                    s=2)
+        plt.savefig("figs/" + dataset.name + "mincut.png", dpi=250)
+    
     # Spectral Clustering
     print("Running Spectral Clustering")
     spectralInstance = SpectralClustering(n_clusters=dataset.k)
     spectralResult = spectralInstance.fit_predict(dataset.data)
     plt.scatter(dataset.data[:, 0], dataset.data[:, 1], c=spectralResult,
                 s=2)
-    plt.show()
+    # plt.show()
+    plt.clf()

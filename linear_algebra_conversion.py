@@ -72,8 +72,8 @@ class coreMatrices:
                                   kernelFunction=kernels.distanceInverse):
         temp = coreMatrices.affinityMatrix(data, kernelFunction)
         diag = temp.sum(axis=1)
-        invDiag = np.diag(
-            np.array([1/math.sqrt(elem) for elem in diag])
+        invDiag = numpy.diag(
+            numpy.array([1/math.sqrt(elem) for elem in diag])
             )
         nAdj = numpy.matmul(invDiag, temp)
         nAdj = numpy.matmul(nAdj, invDiag)
